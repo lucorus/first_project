@@ -25,3 +25,4 @@ class CategoryAdmin(admin.ModelAdmin):
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(History, HistoryAdmin)
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(Album)

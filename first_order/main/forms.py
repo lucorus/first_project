@@ -95,7 +95,7 @@ class UserLoginForm(AuthenticationForm):
 class HistoryForm(forms.ModelForm):
     class Meta:
         model = History
-        fields = ['title', 'text', 'level', 'category']
+        fields = ['title', 'text', 'level', 'category', 'album']
 
     def __init__(self, *args, **kwargs):
         super(HistoryForm, self).__init__(*args, **kwargs)
@@ -103,3 +103,9 @@ class HistoryForm(forms.ModelForm):
         self.fields['text'].widget.attrs.update({'class': 'form-control', 'placeholder': "Текст:", 'rows': 6})
         self.fields['level'].widget.attrs.update({'class': 'form-control col-md-1', 'placeholder': "Уровень доступа"})
         self.fields['category'].widget.attrs.update({'class': 'form-control col-md-3', 'placeholder': "Категория"})
+
+
+class AlbumForm(forms.ModelForm):
+    class Meta:
+        model = Album
+        fields = ['first_image', 'second_image', 'third_image', 'fourth_image']

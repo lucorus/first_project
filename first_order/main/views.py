@@ -1,12 +1,36 @@
 from django.contrib import messages
 from django.contrib.auth import logout, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import PasswordChangeView
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.utils.text import slugify
-
-
-from django.views.generic import CreateView
-
+from django.views.generic import CreateView, DetailView, ListView
 from .forms import *
+from .models import *
+
+
+@login_required
+def histories(request):
+    search_query = request.GET.get('q')
+
+    if search_query:
+        history = History.objects.filter(title__icontains=search_query)
+        hist = History.objects.filter(category__title__icontains=search_query)
+    else:
+        history = History.objects.all()
+        hist = History.objects.all()
+
+    context = {
+        'history': hist | history
+    }
+    return render(request, 'histories/history_page.html', context)
+
+
+class HistoriesView(DetailView):
+    template_name = 'histories/history_page.html'
+    model = History
+    context_object_name = 'history'
 
 
 def create_category(request):
@@ -21,6 +45,16 @@ def create_category(request):
     return form
 
 
+def create_album(request):
+    if request.method == 'POST':
+        form = AlbumForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+    else:
+        form = AlbumForm()
+    return form
+
+
 def create_history(request):
     if request.method == 'POST':
         form = HistoryForm(request.POST, request.FILES)
@@ -29,14 +63,15 @@ def create_history(request):
             history.author = request.user
             history.save()
             form.save()
-            return redirect('main_page')
+            return redirect('/')
     else:
         form = HistoryForm()
     category_form = create_category(request)
-    return render(request, 'histories/create_history.html', {'form': form, 'category_form': category_form})
+    album_form = create_album(request)
+    return render(request, 'histories/create_history.html', {'form': form, 'category_form': category_form, 'album_form': album_form})
 
 
-def main_page(request):
+def main_page(request, text=None):
     #cont = CustomUser.objects.all()
     #con = cont[id]
     if request.method == 'POST':
@@ -45,12 +80,12 @@ def main_page(request):
             user = form.get_user()
             #user = form.get.objects.latests.filter(id=request.user.id)
             login(request, user)
-            return redirect('main_page')
+            return redirect('/')
         else:
             messages.error(request, 'Ошибка')
     else:
         form = UserLoginForm()
-    return render(request, 'main/main_page.html', {'form': form})
+    return render(request, 'main/main_page.html', {'form': form, 'text': text})
 
 
 class Register(CreateView):
@@ -77,11 +112,19 @@ def register(request):
 
 def user_logout(request):
     logout(request)
-    return redirect('main_page')
+    return redirect('/')
+
+
+def is_showing(request):
+    text = False
+    return main_page(request, text)
 
 
 def profile(request, slug):
     model = CustomUser.objects.filter(slug=slug)
+    #user = model
+    profile_owner = CustomUser.objects.get(slug=slug)
+    history = History.objects.all()
     if request.method == 'POST':
         form = CustomUserChangeForm(request.POST, request.FILES)
         Userr = CustomUser.objects.get(slug=slug)
@@ -103,4 +146,57 @@ def profile(request, slug):
             return redirect('/')
     else:
         form = CustomUserChangeForm()
-    return render(request, 'main/profile.html', {'model': model, 'form': form})
+    return render(request, 'main/profile.html', {'model': model, 'form': form, 'history': history, 'profile_owner': profile_owner})
+
+
+def edit_profile(request, slug):
+    user = CustomUser.objects.get(slug=slug)
+    if request.method == 'POST':
+        form = CustomUserChangeForm(request.POST, request.FILES)
+        if form.is_valid():
+            userr = form.save(commit=False)
+            user.username = userr.username
+            user.avatar = userr.avatar
+            user.status = userr.status
+            #user.slug = userr.slug
+            user.save()
+            redirect('/')
+    else:
+        form = CustomUserChangeForm()
+    return render(request, 'main/edit_profile.html', {'form': form})
+
+
+from django.http import HttpResponse
+
+
+def up_level(request, slug, level):
+    user = CustomUser.objects.get(slug=slug)
+    user.level = level
+    if user.level > 3:
+        user.level = 3
+        text = False
+        return main_page(request, text)
+    else:
+        user.save()
+        text = 'Уровень успешно повышен'
+        return main_page(request, text)
+
+
+class ChangePasswordView(PasswordChangeView):
+    form_class = PasswordChangingForm
+    template_name = 'main/change_password.html'
+    success_url = reverse_lazy('main_page')
+
+
+class Search(ListView):
+    template_name = 'histories/history.html'
+
+    def get_queryset(self):
+        q = self.request.GET.get('q').capitalize()
+        return History.objects.filter(title__icontains=q)
+        #return History.objects.filter(title__icontains=q)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['q'] = self.request.GET.get("q")
+        return context

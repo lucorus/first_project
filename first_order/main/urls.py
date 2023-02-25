@@ -5,6 +5,11 @@ urlpatterns = [
     path('', main_page, name='main_page'),
     path('logout', user_logout, name='logout_user'),
     path('register', register, name='register'),
-    path('/profile/<slug:slug>', profile, name='profile'),
+    path('profile/<slug:slug>', profile, name='profile'),
     path('create_history', create_history, name='create_history'),
+    path('histories/', histories, name='histories'),
+    path('edit_profile/<slug:slug>', edit_profile, name='edit_profile'),
+    path('LevelUp/<slug:slug>/<int:int>', up_level, name='LevelUp'),
+    path('password/', ChangePasswordView.as_view()),
+    path('search/', Search.as_view(), name='search'),
 ]

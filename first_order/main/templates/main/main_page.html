@@ -12,7 +12,7 @@
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="/">Информация</a>
+    <a class="navbar-brand" href="/">Главная</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -24,17 +24,16 @@
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
 
-                <a class="nav-link" href="comment_page">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                         class="bi bi-archive" viewBox="0 0 16 16">
-                        <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1V2zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
-                    </svg>
-                    Комментарии<span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="/histories/">Истории<span class="sr-only">(current)</span></a>
+
 
             <li class="nav-item dropdown">
                 {% if request.user.is_authenticated %}
-            <li class="nav-item active">
 
+            <li class="nav-item active">
+            {% if request.user.level > 1 %}
+                <a class="nav-link" href="create_history">Создать историю<span class="sr-only">(current)</span></a>
+            {% endif %}
                 <!--<a class="nav-link" href="create_comment">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                          class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -51,6 +50,7 @@
         </ul>
     </div>
 <div align="right">
+
     {% if request.user.is_authenticated %}
         <a class="navbar-brand" href="{{ request.user.get_absolute_url }}">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -125,10 +125,130 @@
 <a href="/password_reset/" class="btn btn-dark-primary">Отправить письмо на эл.почту</a>-->
 
 
+{% if text %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ text }}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif %}
+
+
+
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+  <h1 class="display-4">Уровни доступа</h1>
+  <p class="lead">Если вы хотите иметь доступ к большему колличеству записей повысьте уровень</p>
+</div>
 
 <div class="container">
+  <div class="card-deck mb-3 text-center">
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header">
+        <h4 class="my-0 font-weight-normal">Начальный</h4>
+      </div>
+      <div class="card-body">
+        <h1 class="card-title pricing-card-title">$0 <small class="text-muted">/ mo</small></h1>
+        <!--<ul class="list-unstyled mt-3 mb-4">
+          <li></li>
+          <li>2 GB of storage</li>
+          <li>Email support</li>
+          <li>Help center access</li>
+        </ul>-->
+            <ul class="list-unstyled mt-3 md-1">
+                <li>Доступ к записям <code>1</code> уровня</li>
+            </ul>
+        <button type="button" class="btn btn-lg btn-block btn-outline-primary">Активно</button>
+      </div>
+    </div>
 
-    <a href="create_history">Создать историю</a>
+
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header">
+        <h4 class="my-0 font-weight-normal">Средний</h4>
+      </div>
+      <div class="card-body">
+        <h1 class="card-title pricing-card-title">$15 <small class="text-muted">/ mo</small></h1>
+        <ul class="list-unstyled mt-3 mb-2">
+          <li>Доступ к записям <code>1</code> и <code>2</code> уровня</li>
+          <li>Возможность создавать записи</li>
+        </ul>
+          {% if request.user.is_authenticated %}
+            {% if request.user.level < 2 %}
+                <a href="LevelUp/{{ request.user.slug }}/2"><button type="button" class="btn btn-lg btn-block btn-primary">Активировать</button></a>
+            {% else %}
+                <button type="button" class="btn btn-lg btn-block btn-outline-primary">Активно</button>
+            {% endif %}
+          {% else %}
+            <button type="button" class="btn btn-lg btn-block btn-primary" data-toggle="modal" data-target="#exampleModal">Активировать</button>
+          {% endif %}
+      </div>
+    </div>
+
+
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header">
+        <h4 class="my-0 font-weight-normal">Полный</h4>
+      </div>
+      <div class="card-body">
+        <h1 class="card-title pricing-card-title">$29 <small class="text-muted">/ mo</small></h1>
+        <ul class="list-unstyled mt-3 mb-2">
+          <li>Доступ ко <code>всем</code> записям</li>
+          <li>Возможность создавать записи</li>
+        </ul>
+          {% if request.user.is_authenticated %}
+            {% if request.user.level < 3 %}
+                <a href="LevelUp/{{ request.user.slug }}/3"><button type="button" class="btn btn-lg btn-block btn-primary">Активировать</button></a>
+            {% else %}
+                <button type="button" class="btn btn-lg btn-block btn-outline-primary">Активно</button>
+            {% endif %}
+          {% else %}
+             <button type="button" class="btn btn-lg btn-block btn-primary" data-toggle="modal" data-target="#exampleModal">Активировать</button>
+          {% endif %}
+      </div>
+    </div>
+
+
+  </div>
+
+  <footer class="pt-4 my-md-5 pt-md-5 border-top">
+    <div class="row">
+      <div class="col-12 col-md">
+        <img class="mb-2" src="/docs/4.6/assets/brand/bootstrap-solid.svg" alt="" width="24" height="24">
+        <small class="d-block mb-3 text-muted">&copy; 2017-2022</small>
+      </div>
+      <div class="col-6 col-md">
+        <h5>Features</h5>
+        <ul class="list-unstyled text-small">
+          <li><a class="text-muted" href="#">Cool stuff</a></li>
+          <li><a class="text-muted" href="#">Random feature</a></li>
+          <li><a class="text-muted" href="#">Team feature</a></li>
+          <li><a class="text-muted" href="#">Stuff for developers</a></li>
+          <li><a class="text-muted" href="#">Another one</a></li>
+          <li><a class="text-muted" href="#">Last time</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-md">
+        <h5>Resources</h5>
+        <ul class="list-unstyled text-small">
+          <li><a class="text-muted" href="#">Resource</a></li>
+          <li><a class="text-muted" href="#">Resource name</a></li>
+          <li><a class="text-muted" href="#">Another resource</a></li>
+          <li><a class="text-muted" href="#">Final resource</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-md">
+        <h5>About</h5>
+        <ul class="list-unstyled text-small">
+          <li><a class="text-muted" href="#">Team</a></li>
+          <li><a class="text-muted" href="#">Locations</a></li>
+          <li><a class="text-muted" href="#">Privacy</a></li>
+          <li><a class="text-muted" href="#">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+</div>
 
 <br>
 

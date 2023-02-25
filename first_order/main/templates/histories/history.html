@@ -1,0 +1,43 @@
+<div class="container">
+    {% for item in history %}
+
+
+    <div class="card text-center">
+  <div class="card-header">
+    <ul class="nav nav-tabs card-header-tabs">
+      <li class="nav-item">
+        <a class="nav-link active" href="#">{{ item.category }}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ item.author.get_absolute_url }}">{{ item.author }}</a>
+      </li>
+
+        <li style="margin-left:82%;">
+        <h6 data-toggle="tooltip" data-placement="top" title="Вы создали эту историю" style="color: #00E104" align="right"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+  <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+</svg></h6></li>
+
+    </ul>
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">{{ item.title }}</h5>
+    <p class="card-text" align="left">{{ item.text }}</p>
+    <!--<a href="#" class="btn btn-primary">...</a>-->
+      <h6 align="right"><small>{{ item.created_add }}</small></h6>
+  </div>
+</div>
+    <!--{{ item.title }}<br>
+    {{ item.text }}<br>
+    {{ item.author }}<br>
+    {{ item.category }}<br>
+    {{ item.created_add }}<br>-->
+
+
+    <!--<img src="{{item.album}}" alt="...">-->
+
+
+
+
+    <br><br>
+    {% endfor %}
+</div>

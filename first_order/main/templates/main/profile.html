@@ -17,7 +17,7 @@
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="/">Информация</a>
+    <a class="navbar-brand" href="/">Главная</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -26,7 +26,7 @@
 
         </ul>
     </div>
-<a class="navbar-brand" href="user_logout"><font color="#E1857B">
+<a class="navbar-brand" href="/logout"><font color="#E1857B">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left"
              viewBox="0 0 16 16">
             <path fill-rule="evenodd"
@@ -38,116 +38,157 @@
             class="sr-only"></span></a>
 </nav>
 <div class="container">
-{% for item in model %}
+    {% for item in model %}
 
-{{ form.non_field_errors }}
-<br>
-<div class="container emp-profile">
-            <form method="post">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="profile-img">
-                            {% if item.avatar %}
-                            <img src="{{ item.avatar.url }}" alt="" width="275" height="183"/>
-                            {% else %}
-                                <img src="/photos/user.png" width="275" height="183">
-                            {% endif %}
+    {{ form.non_field_errors }}
+    <br>
+    <div class="container emp-profile">
+        <form method="post">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="profile-img">
+                        {% if item.avatar %}
+                        <img src="{{ item.avatar.url }}" alt="" width="275" height="183"/>
+                        {% else %}
+                        <img src="/photos/user.png" width="275" height="183">
+                        {% endif %}
 
-                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="profile-head">
-                                    <h5>
-                                        {{ item.username }}
-                                    </h5>
-                                    <h6>
-                                        {{ item.status }}
-                                    </h6>
-                            <br>
-                            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Информация о пользователе</a>
+                </div>
+                <div class="col-md-6">
+                    <div class="profile-head">
+                        <h5>
+                            {{ item.username }}
+                        </h5>
+                        <h6>
+                            {{ item.status }}
+                        </h6>
+                        <br>
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab"
+                                   aria-controls="home" aria-selected="true">Информация о пользователе</a>
 
-                                </li>
-                                <!--<li class="nav-item">
-                                    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Timeline</a>
-                                </li>-->
-                        </div>
+                            </li>
+                            <!--<li class="nav-item">
+                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Timeline</a>
+                            </li>-->
                     </div>
-                    {% if request.user.id == item.id %}
-                    <div class="col-md-2">
-                        <!--<a class="btn btn-dark" href="/edit_profile/{{ request.user.id }}">Редактировать профиль</a>-->
-                        <!-- Button trigger modal -->
-                        <!--<button type="button" class="btn btn-dark" data-toggle="modal" data-target="#staticBackdrop">
-                            Редактировать профиль
-                        </button>-->
-                        <a class="btn btn-dark" href="/edit_profile/{{ request.user.id }}">Редактировать профиль</a>
+                </div>
+                {% if request.user.slug == item.slug %}
+                <div class="col-md-2">
+                    <!--<a class="btn btn-dark" href="/edit_profile/{{ request.user.id }}">Редактировать профиль</a>-->
+                    <!-- Button trigger modal -->
+                    <!--<button type="button" class="btn btn-dark" data-toggle="modal" data-target="#staticBackdrop">
+                        Редактировать профиль
+                    </button>-->
+                    <a class="btn btn-dark" href="/edit_profile/{{ request.user.slug }}">Редактировать профиль</a>
 
-                        <!-- Modal -->
-                        <form method="post" enctype="multipart/form-data" class="post-form">
-                            {% csrf_token %}
-                            <div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true"> <!--data-backdrop="static" data-keyboard="false"-->
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="staticBackdropLabel">Редактирование профиля</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
+                    <!-- Modal -->
+                    <form method="post" enctype="multipart/form-data" class="post-form">
+                        {% csrf_token %}
+                        <div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                             aria-hidden="true"> <!--data-backdrop="static" data-keyboard="false"-->
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="staticBackdropLabel">Редактирование профиля</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!--Имя Пользователя:
+                                        <input class="form-control" type="text" name="username"
+                                               placeholder="{{ item.username }}">
+                                        <div class="form-group">
+                                            <label for="exampleFormControlTextarea1">Описание:</label>
+                                            <textarea class="form-control" id="exampleFormControlTextarea1" name="description" placeholder="{{ item.description }}"
+                                                      rows="5"></textarea>
                                         </div>
-                                        <div class="modal-body">
-                                            <!--Имя Пользователя:
-                                            <input class="form-control" type="text" name="username"
-                                                   placeholder="{{ item.username }}">
-                                            <div class="form-group">
-                                                <label for="exampleFormControlTextarea1">Описание:</label>
-                                                <textarea class="form-control" id="exampleFormControlTextarea1" name="description" placeholder="{{ item.description }}"
-                                                          rows="5"></textarea>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="exampleFormControlFile1">Аватар:</label>
-                                                <input type="file" class="form-control-file" name="avatar"
-                                                       id="exampleFormControlFile1">
-                                            </div>-->
-{{ form.non_field_errors }}
-                                            {{ form.as_p }}
+                                        <div class="form-group">
+                                            <label for="exampleFormControlFile1">Аватар:</label>
+                                            <input type="file" class="form-control-file" name="avatar"
+                                                   id="exampleFormControlFile1">
+                                        </div>-->
+                                        {{ form.non_field_errors }}
+                                        {{ form.as_p }}
 
 
-
-
-                                        </div>
-                                        <div class="modal-footer">
-                                            <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>-->
-                                            <button class="btn btn-primary" type="submit">Сохранить</button>
-                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>-->
+                                        <button class="btn btn-primary" type="submit">Сохранить</button>
                                     </div>
                                 </div>
                             </div>
-                    </div>
-            </form>
-    {% endif %}
-
-                </div>
-
-                <div class="row">
-                    <div class="col-md-4" >
-                        <div class="profile-work">
-
                         </div>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="tab-content profile-tab" id="myTabContent" style="margin-top:-40px">
-                            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-
-                            </div>
-
-
-                            </div>
-                        </div>
-                    </div>
                 </div>
-            </form>
+        </form>
+        {% endif %}
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="profile-work">
+
+            </div>
         </div>
+        <div class="col-md-8">
+            <div class="tab-content profile-tab" id="myTabContent" style="margin-top:-40px">
+                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+</form>
+
+
+<br>
+{% for item2 in history %}
+{% if item2.author == profile_owner %}
+{% if request.user.level >= item2.level or request.user == item2.author %}
+
+    <div class="card text-center">
+  <div class="card-header">
+    <ul class="nav nav-tabs card-header-tabs">
+      <li class="nav-item">
+        <a class="nav-link active" href="#">{{ item2.category }}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ item.author.get_absolute_url }}">{{ item2.author }}</a>
+      </li>
+        {% if request.user == item2.author %}
+        <li style="margin-left:82%;">
+        <h6 data-toggle="tooltip" data-placement="top" title="Вы создали эту историю" style="color: #00E104" align="right"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+  <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+</svg></h6></li>
+        {% endif %}
+    </ul>
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">{{ item2.title }}</h5>
+    <p class="card-text" align="left">{{ item2.text }}</p>
+    <!--<a href="#" class="btn btn-primary">...</a>-->
+      <h6 align="right"><small>{{ item2.created_add }}</small></h6>
+  </div>
+</div>
+    <!--{{ item.title }}<br>
+    {{ item.text }}<br>
+    {{ item.author }}<br>
+    {{ item.category }}<br>
+    {{ item.created_add }}<br>-->
+    {% else %}
+{% endif %}
+    {% endif %}
+    <br><br>
+{% endfor %}
+</div>
 
 
 
@@ -163,7 +204,8 @@
 
 
 {% endfor %}
-</div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
 </body>

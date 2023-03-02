@@ -4,8 +4,8 @@ from .forms import *
 
 
 class CustomUserAdmin(admin.ModelAdmin):
-    add_form = CustomUserCreationForm
-    form = CustomUserChangeForm
+    #add_form = CustomUserCreationForm
+    #form = CustomUserChangeForm
     model = CustomUser
     list_display = ['id', 'slug', 'username', 'level', 'status', 'email', 'avatar', 'password']
     prepopulated_fields = {'slug': ('username',)}

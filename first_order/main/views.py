@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.utils.text import slugify
@@ -17,12 +18,16 @@ def histories(request):
     if search_query:
         history = History.objects.filter(title__icontains=search_query)
         hist = History.objects.filter(category__title__icontains=search_query)
+        paginator = Paginator(history | hist, 1)
     else:
         history = History.objects.all()
         hist = History.objects.all()
+        paginator = Paginator(History.objects.all(), 4)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
 
     context = {
-        'history': hist | history
+        'history': page_object
     }
     return render(request, 'histories/history_page.html', context)
 
@@ -122,14 +127,12 @@ def is_showing(request):
 
 def profile(request, slug):
     model = CustomUser.objects.filter(slug=slug)
-    #user = model
     profile_owner = CustomUser.objects.get(slug=slug)
-    history = History.objects.all()
+    history = History.objects.filter(author=profile_owner)
     if request.method == 'POST':
         form = CustomUserChangeForm(request.POST, request.FILES)
         Userr = CustomUser.objects.get(slug=slug)
         if form.is_valid():
-            #img = form.cleaned_data['avatar']
 
             changed_user = form.save(commit=False)
             Userr.username = changed_user.username
@@ -142,11 +145,13 @@ def profile(request, slug):
             cont = CustomUser.objects.latest('id').id
             usr = CustomUser.objects.get(id=cont)
             usr.delete()
-            #return render(request, 'main/profile.html', {'model': model, 'form': form})
             return redirect('/')
     else:
         form = CustomUserChangeForm()
-    return render(request, 'main/profile.html', {'model': model, 'form': form, 'history': history, 'profile_owner': profile_owner})
+    paginator = Paginator(history, 1)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+    return render(request, 'main/profile.html', {'model': model, 'form': form, 'history': page_object, 'profile_owner': profile_owner})
 
 
 def edit_profile(request, slug):
@@ -158,15 +163,11 @@ def edit_profile(request, slug):
             user.username = userr.username
             user.avatar = userr.avatar
             user.status = userr.status
-            #user.slug = userr.slug
             user.save()
             redirect('/')
     else:
         form = CustomUserChangeForm()
     return render(request, 'main/edit_profile.html', {'form': form})
-
-
-from django.http import HttpResponse
 
 
 def up_level(request, slug, level):
@@ -194,9 +195,15 @@ class Search(ListView):
     def get_queryset(self):
         q = self.request.GET.get('q').capitalize()
         return History.objects.filter(title__icontains=q)
-        #return History.objects.filter(title__icontains=q)
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['q'] = self.request.GET.get("q")
         return context
+
+
+def histories_with_filter(request, pk):
+    paginator = Paginator(History.objects.filter(category_id=pk), 4)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+    return render(request, 'histories/history_page.html', {'history': page_object})

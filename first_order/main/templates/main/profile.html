@@ -191,6 +191,29 @@
 </div>
 
 
+<nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-center">
+      <a class="page-link"  href="?page=2">В начало</a>
+    <li class="page-item">
+
+        {% if history.has_previous %}
+      <a class="page-link"  href="?page={{ history.previous_page_number }}">Назад</a>
+        {% else %}
+
+        {% endif %}
+    </li>
+      {% if history.has_next %}
+<li class="page-item"><a class="page-link" href="?page={{ history.next_page_number }}">Далее</a></li>
+      {% endif %}
+
+      <a class="page-link"  href="?page={{ history.paginator.num_pages }}">В конец</a>
+  </ul>
+    <p class="page-item" align="center">
+            Страница номер <a href="#">{{ history.number }}</a> из {{ history.paginator.num_pages }}
+        </p>
+</nav>
+
+
 
 
 

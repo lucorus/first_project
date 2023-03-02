@@ -9,7 +9,8 @@ urlpatterns = [
     path('create_history', create_history, name='create_history'),
     path('histories/', histories, name='histories'),
     path('edit_profile/<slug:slug>', edit_profile, name='edit_profile'),
-    path('LevelUp/<slug:slug>/<int:int>', up_level, name='LevelUp'),
+    path('LevelUp/<slug:slug>/<int:level>', up_level, name='LevelUp'),
     path('password/', ChangePasswordView.as_view()),
     path('search/', Search.as_view(), name='search'),
+    path('histories/<int:pk>', histories_with_filter, name='historiesF'),
 ]

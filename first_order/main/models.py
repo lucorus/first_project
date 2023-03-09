@@ -15,7 +15,6 @@ class IntegerRangeField(models.IntegerField):
 
 
 class CustomUser(AbstractUser):
-    #username = models.CharField(max_length=16, verbose_name='Имя пользователя', unique=True)
     status = models.CharField(max_length=30, blank=True, verbose_name="Статус")
     avatar = models.ImageField(upload_to='photos', blank=True, verbose_name="Аватар")
     level = IntegerRangeField(max_value=3, min_value=1, default=1, verbose_name="Уровень доступа")
@@ -32,13 +31,6 @@ class CustomUser(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
 
-class Album(models.Model):
-    first_image = models.ImageField(upload_to='Album',  blank=True)
-    second_image = models.ImageField(upload_to='Album',  blank=True)
-    third_image = models.ImageField(upload_to='Album', blank=True)
-    fourth_image = models.ImageField(upload_to='Album', blank=True)
-
-
 class History(models.Model):
     title = models.CharField(max_length=35, unique=True, verbose_name="Название")
     text = models.TextField(verbose_name="Текст")
@@ -46,7 +38,7 @@ class History(models.Model):
     created_add = models.DateTimeField(auto_now_add=True, verbose_name='Создано в')
     category = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name='Автор')
-    album = models.ImageField(Album, null=True, blank=True)
+    image = models.ImageField(upload_to='Album', blank=True, verbose_name='Изображение')
 
     def __str__(self):
         return self.title

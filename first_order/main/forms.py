@@ -23,7 +23,7 @@ class CustomUserCreationForm(UserCreationForm):
         self.fields['password2'].widget.attrs.update({'class': 'form-control', 'placeholder': "введите пароль ещё раз"})
         self.fields['status'].widget.attrs.update({'class': 'form-control', 'placeholder': "введите описание вашего профиля"})
         self.fields['email'].widget.attrs.update({'class': 'form-control', 'placeholder': "введите ваш адрес эл. почты"})
-        self.fields['avatar'].widget.attrs.update({'null': 'photos/user.png', 'placeholder': "ваш аватар"})
+        self.fields['avatar'].widget.attrs.update({'default': 'photos/user.png', 'placeholder': "ваш аватар"})
 
         for fieldname in ['username', 'password1', 'password2']:
             self.fields[fieldname].help_text = None
@@ -95,7 +95,7 @@ class UserLoginForm(AuthenticationForm):
 class HistoryForm(forms.ModelForm):
     class Meta:
         model = History
-        fields = ['title', 'text', 'level', 'category', 'album']
+        fields = ['title', 'text', 'level', 'category', 'image']
 
     def __init__(self, *args, **kwargs):
         super(HistoryForm, self).__init__(*args, **kwargs)
@@ -104,8 +104,3 @@ class HistoryForm(forms.ModelForm):
         self.fields['level'].widget.attrs.update({'class': 'form-control col-md-1', 'placeholder': "Уровень доступа"})
         self.fields['category'].widget.attrs.update({'class': 'form-control col-md-3', 'placeholder': "Категория"})
 
-
-class AlbumForm(forms.ModelForm):
-    class Meta:
-        model = Album
-        fields = ['first_image', 'second_image', 'third_image', 'fourth_image']

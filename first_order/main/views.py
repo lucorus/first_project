@@ -11,38 +11,32 @@ from .forms import *
 from .models import *
 
 
+# данная функция собирает все объекты класса History если нет заданного слова для поиска, а если оно есть, то оно выводит все посты у которых категория или название похоже на введённое слово
 @login_required
 def histories(request):
     search_query = request.GET.get('q')
-
     if search_query:
         history = History.objects.filter(title__icontains=search_query)
         hist = History.objects.filter(category__title__icontains=search_query)
         paginator = Paginator(history | hist, 1)
     else:
-        history = History.objects.all()
-        hist = History.objects.all()
         paginator = Paginator(History.objects.all(), 4)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
 
     context = {
-        'history': page_object
+        'history': page_object,
     }
     return render(request, 'histories/history_page.html', context)
 
 
-class HistoriesView(DetailView):
-    template_name = 'histories/history_page.html'
-    model = History
-    context_object_name = 'history'
-
-
+# функция для создания категории
 def create_category(request):
     if request.method == 'POST':
         form = CreateCategoryForm(request.POST, request.FILES)
         if form.is_valid():
             category = form.save(commit=False)
+            # slug категории соответствует названию категории
             category.slug = slugify(category.title, allow_unicode=True)
             category.save()
     else:
@@ -50,16 +44,7 @@ def create_category(request):
     return form
 
 
-def create_album(request):
-    if request.method == 'POST':
-        form = AlbumForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-    else:
-        form = AlbumForm()
-    return form
-
-
+# функция для создания истории и если пользователь на найдёт нужной ему категории, то он сможет создать её в modal
 def create_history(request):
     if request.method == 'POST':
         form = HistoryForm(request.POST, request.FILES)
@@ -72,18 +57,15 @@ def create_history(request):
     else:
         form = HistoryForm()
     category_form = create_category(request)
-    album_form = create_album(request)
-    return render(request, 'histories/create_history.html', {'form': form, 'category_form': category_form, 'album_form': album_form})
+    return render(request, 'histories/create_history.html', {'form': form, 'category_form': category_form})
 
 
+# на главной странице пользователь может войти в свой аккаунт, введя данные в всплывающую modal
 def main_page(request, text=None):
-    #cont = CustomUser.objects.all()
-    #con = cont[id]
     if request.method == 'POST':
         form = UserLoginForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            #user = form.get.objects.latests.filter(id=request.user.id)
             login(request, user)
             return redirect('/')
         else:
@@ -93,18 +75,12 @@ def main_page(request, text=None):
     return render(request, 'main/main_page.html', {'form': form, 'text': text})
 
 
-class Register(CreateView):
-    form_class = CustomUserCreationForm
-    success_url = '/'
-    template_name = 'main/create_user.html'
-
-
+# регистрация пользователя
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
-            #user.username = str(user.username)
             user.slug = str(user.username)
             user.save()
             login(request, user)
@@ -120,28 +96,29 @@ def user_logout(request):
     return redirect('/')
 
 
+# данная функция вызывается когда пользователь повышает уровень и вывод результат
 def is_showing(request):
     text = False
     return main_page(request, text)
 
 
+# данная функция даёт возможность посмотреть профиль указанного пользователя
 def profile(request, slug):
     model = CustomUser.objects.filter(slug=slug)
     profile_owner = CustomUser.objects.get(slug=slug)
     history = History.objects.filter(author=profile_owner)
     if request.method == 'POST':
         form = CustomUserChangeForm(request.POST, request.FILES)
-        Userr = CustomUser.objects.get(slug=slug)
         if form.is_valid():
-
+            # скорее всего данная реализация не совсем верна, но  я создаю нового пользователя с изменёнными значениями, а потом присваиваю их текущему пользователю и удаляю промежуточного юзера (эта часть нужна для возможности изменения профиля пользователя через modal в профиле
             changed_user = form.save(commit=False)
-            Userr.username = changed_user.username
+            profile_owner.username = changed_user.username
 
-            Userr.description = changed_user.description
+            profile_owner.description = changed_user.description
 
-            Userr.avatar = changed_user.avatar
+            profile_owner.avatar = changed_user.avatar
             changed_user.save()
-            Userr.save()
+            profile_owner.save()
             cont = CustomUser.objects.latest('id').id
             usr = CustomUser.objects.get(id=cont)
             usr.delete()
@@ -154,11 +131,13 @@ def profile(request, slug):
     return render(request, 'main/profile.html', {'model': model, 'form': form, 'history': page_object, 'profile_owner': profile_owner})
 
 
+# изменение профиля пользователя
 def edit_profile(request, slug):
     user = CustomUser.objects.get(slug=slug)
     if request.method == 'POST':
         form = CustomUserChangeForm(request.POST, request.FILES)
         if form.is_valid():
+            # если введённые данные коректны, то я создаю промежуточного пользователя и присваиваю основному пользователю значения промежутчного пользователя, промежуточный пользователь удаляется
             userr = form.save(commit=False)
             user.username = userr.username
             user.avatar = userr.avatar
@@ -170,6 +149,7 @@ def edit_profile(request, slug):
     return render(request, 'main/edit_profile.html', {'form': form})
 
 
+# эта функция поднимает уровень пользователя до уровня level (level - число которое нужно присвоить пользователю)
 def up_level(request, slug, level):
     user = CustomUser.objects.get(slug=slug)
     user.level = level
@@ -189,19 +169,7 @@ class ChangePasswordView(PasswordChangeView):
     success_url = reverse_lazy('main_page')
 
 
-class Search(ListView):
-    template_name = 'histories/history.html'
-
-    def get_queryset(self):
-        q = self.request.GET.get('q').capitalize()
-        return History.objects.filter(title__icontains=q)
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context['q'] = self.request.GET.get("q")
-        return context
-
-
+# нахождение категорий по заданному слову
 def histories_with_filter(request, pk):
     paginator = Paginator(History.objects.filter(category_id=pk), 4)
     page_number = request.GET.get('page')

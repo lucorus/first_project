@@ -11,6 +11,5 @@ urlpatterns = [
     path('edit_profile/<slug:slug>', edit_profile, name='edit_profile'),
     path('LevelUp/<slug:slug>/<int:level>', up_level, name='LevelUp'),
     path('password/', ChangePasswordView.as_view()),
-    path('search/', Search.as_view(), name='search'),
     path('histories/<int:pk>', histories_with_filter, name='historiesF'),
 ]

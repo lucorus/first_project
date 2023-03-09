@@ -38,6 +38,7 @@
             class="sr-only"></span></a>
 </nav>
 <div class="container">
+
     {% for item in model %}
 
     {{ form.non_field_errors }}
@@ -174,15 +175,16 @@
   <div class="card-body">
     <h5 class="card-title">{{ item2.title }}</h5>
     <p class="card-text" align="left">{{ item2.text }}</p>
-    <!--<a href="#" class="btn btn-primary">...</a>-->
+
+
+      {% if item2.image %}
+        <img src="{{ item2.image.url }}" width="250" height="183">
+      {% endif %}
+
       <h6 align="right"><small>{{ item2.created_add }}</small></h6>
   </div>
 </div>
-    <!--{{ item.title }}<br>
-    {{ item.text }}<br>
-    {{ item.author }}<br>
-    {{ item.category }}<br>
-    {{ item.created_add }}<br>-->
+
     {% else %}
 {% endif %}
     {% endif %}

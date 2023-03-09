@@ -69,7 +69,7 @@
             </svg>
             Профиль
             <span class="sr-only">(current)</span></a>
-    <a class="navbar-brand" href="logout"><font color="#E1857B">
+    <a class="navbar-brand" href="/"><font color="#E1857B">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left"
              viewBox="0 0 16 16">
             <path fill-rule="evenodd"
@@ -81,7 +81,7 @@
 
     {% else %}
 
-    <a class="btn btn-dark navbar-brand" href="register">Регистрация</a>
+    <a class="btn btn-dark navbar-brand" href="/register">Регистрация</a>
 
     <button type="button" class="btn btn-dark navbar-brand" data-toggle="modal" data-target="#exampleModal">
         <font style="color: #00E104">
@@ -149,11 +149,17 @@
 </svg></h6></li>
         {% endif %}
     </ul>
+
   </div>
   <div class="card-body">
     <h5 class="card-title">{{ item.title }}</h5>
     <p class="card-text" align="left">{{ item.text }}</p>
-    <!--<a href="#" class="btn btn-primary">...</a>-->
+
+      {% if item.image %}
+        <img src="{{ item.image.url }}" width="250" height="183">
+      {% endif %}
+
+
       <h6 align="right"><small>{{ item.created_add }}</small></h6>
   </div>
 </div>
